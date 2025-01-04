@@ -8,14 +8,20 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "Kai.C.AceVocab",
+      "appleTeamId": "3NX9YQA562"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "Kai.C.AceVocab"
     },
     "web": {
       "bundler": "metro",
@@ -31,6 +37,21 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "expo-sqlite",
+        {
+          "enableFTS": true,
+          "useSQLCipher": true
+        }
+      ],
+      [
+        "expo-asset",
+        {
+          "assets": [
+            "./assets/vocabulary.db"
+          ]
         }
       ]
     ],
