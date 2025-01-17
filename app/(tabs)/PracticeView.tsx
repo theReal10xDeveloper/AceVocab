@@ -2,14 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Button, ActivityIndicator, Alert } from 'react-native';
 import axios from 'axios';
 import GPTService from '@/services/GPTservice';
-import DatabaseService from '@/services/database_service';
+import DatabaseService from '@/services/local_database_service';
 import { ThemedText } from '@/components/ThemedText';
+
 const Content = () => {
   const [loading, setLoading] = useState(false);
   const [question, setQuestion] = useState('');
   const [options, setOptions] = useState([]);
   const [correctAnswer, setCorrectAnswer] = useState([]);
   var db = null;
+
+  useEffect(() => {
+    generateQuestion();
+  }, []);
 
   const generateQuestion = async () => {
     setLoading(true);
@@ -54,11 +59,9 @@ const Content = () => {
     }
   };
 
-  useEffect(() => {
-    generateQuestion();
-  }, []);
 
-  const handleAnswer = (selectedOption) => {
+
+  const handleAnswer = (selectedOption : any) => {
     if (selectedOption === correctAnswer) {
       Alert.alert('Correct!', 'You selected the right answer.');
     } else {

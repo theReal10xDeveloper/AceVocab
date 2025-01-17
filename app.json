@@ -14,7 +14,8 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "Kai.C.AceVocab",
-      "appleTeamId": "3NX9YQA562"
+      "appleTeamId": "3NX9YQA562",
+      "usesAppleSignIn": true
     },
     "android": {
       "adaptiveIcon": {
@@ -52,6 +53,12 @@
           "assets": [
             "./assets/vocabulary.db"
           ]
+        }
+      ],
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.297363518648-p4uvjst5td2qvu7gfmm54netj1cag9bp.apps.googleusercontent.com"
         }
       ]
     ],
