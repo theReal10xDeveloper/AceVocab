@@ -23,8 +23,8 @@ class DatabaseService {
     }
 
     // Check if the database file already exists
-    const fileInfo = await FileSystem.getInfoAsync(localURI);
-    if (!fileInfo.exists) {
+    // const fileInfo = await FileSystem.getInfoAsync(localURI);
+    if (true) {
       // If the file does not exist, proceed with the copying logic
       let asset = Asset.fromModule(require("@/assets/vocabulary.db"));
 
@@ -95,5 +95,35 @@ class DatabaseService {
       throw error;
     }
   }
+
+  public static async getWordID(word: string): Promise<number> {
+    const db = await DatabaseService.getInstance();
+    try {
+      const result = (await db.getAllAsync(
+        "SELECT id FROM words WHERE word = ?",
+        [word]
+      )) as { id: number }[];
+      // console.log("Fetched word ID:", result[0].id);
+      return result[0].id;
+    } catch (error) {
+      console.error("Error fetching word ID:", error);
+      throw error;
+    }
+  }
+
+  public static async getWord(id: number): Promise<string> {
+    const db = await DatabaseService.getInstance();
+    try {
+      const result = (await db.getAllAsync(
+        "SELECT word FROM words WHERE id = ?",
+        [id]
+      )) as { word: string }[];
+      return result[0].word;
+    } catch (error) {
+      console.error("Error fetching word:", error);
+      throw error;
+    }
+  }
 }
+
 export default DatabaseService;
