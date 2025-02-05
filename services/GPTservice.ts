@@ -1,7 +1,7 @@
 import axios from "axios";
 
 class GPTservice {
-  private static apiKey: string;
+  static apiKey: string = "Bearer " + process.env.EXPO_PUBLIC_API_KEY;
 
   public static async generateFillSentence(
     correctWord: String
@@ -19,7 +19,7 @@ class GPTservice {
       },
       {
         headers: {
-          Authorization: `Bearer sk-proj-ajSi9iCrsfviNsQcFIGmT3BlbkFJJD4d38qsYlHF7efdnSpS`, // Replace with your actual API key
+          Authorization: this.apiKey, // Replace with your actual API key
           "Content-Type": "application/json",
         },
       }

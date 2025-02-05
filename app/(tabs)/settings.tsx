@@ -10,15 +10,19 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Auth } from '@/components/Auth.apple';
 import SupabaseService, { supabase } from '@/services/supabase';
 import { useEffect, useState } from 'react';
+import WordCard from '@/components/WordCard';
 
 export default function SettingsView() {
     const [user, setUser] = useState(null);
 
   useEffect(() => {
     // Fetch the current user session
-      const user = SupabaseService.getUserWords()
-      const words = {1:{"correct": 0,"wrong": 0,"seen":0},2:{"correct": 0,"wrong": 0,"seen":0}}
-      SupabaseService.updateUserWords(words);
+      const user = SupabaseService.fetchUserWords()
+      const words = {}
+    // SupabaseService.updateUserWord(words);
+    console.log(user);
+
+
   }, []);
 
   return (
@@ -26,7 +30,10 @@ export default function SettingsView() {
         <ThemedText style={{ fontSize: 18, marginBottom: 20 }}>Settings</ThemedText>
           <Auth/>
           <ThemedText style={{ fontSize: 18, marginBottom: 70 }}>Select Vocab Presets</ThemedText>
-          <ThemedText style={{ fontSize: 18, marginBottom: 70 }}>{user}</ThemedText>
+      <ThemedText style={{ fontSize: 18, marginBottom: 70 }}>{user}</ThemedText>
+      <WordCard
+        wordId={13567}
+      />
     </View>
   );
 }

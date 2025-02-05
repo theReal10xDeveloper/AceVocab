@@ -1,6 +1,7 @@
 import "react-native-url-polyfill/auto";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient } from "@supabase/supabase-js";
+import DatabaseService from "./local_database_service";
 
 const supabaseUrl = "https://ndlvkbhcwtntrhtkdllg.supabase.co";
 const supabaseAnonKey =
@@ -16,7 +17,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 });
 
 export class WordData {
-  id: number;
   seenCorrect: number;
   seenWrong: number;
   correct: number;
@@ -29,7 +29,6 @@ export class WordData {
     correct: number,
     wrong: number
   ) {
-    this.id = id;
     this.seenCorrect = seenCorrect;
     this.seenWrong = seenWrong;
     this.correct = correct;
@@ -42,11 +41,17 @@ export class WordData {
     );
   }
 }
-export interface UserWordData {
-  words: WordData[];
+
+export enum AnswerType {
+  Correct = "Correct",
+  Wrong = "Wrong",
+  SeenCorrect = "SeenCorrect",
+  SeenWrong = "SeenWrong",
 }
 
 class SupabaseService {
+  static userWords: { [wordId: string]: WordData } = {};
+
   static async getUser() {
     const { data, error } = await supabase.auth.getUser();
     if (error) {
@@ -56,81 +61,178 @@ class SupabaseService {
     return data.user;
   }
 
-  static async getUserWords() {
-    // Retrieve user information
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError) {
-      console.log("Error getting user:", authError);
-      return null;
-    }
-
-    const user = authData.user;
+  static async fetchUserWords(): Promise<{ [wordId: string]: WordData }> {
+    const user = await this.getUser();
     if (!user) {
       console.log("No user found");
-      return null;
+      return {};
     }
 
-    // Retrieve user profile information
-    const { data, error, status } = await supabase
-      .from("profiles") // Ensure the table name matches exactly with your database
-      .select("*")
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("words")
       .eq("id", user.id)
       .single();
 
-    if (error) {
-      console.log("Error fetching user words:", error);
-      return null;
+    if (error || !data || !data.words) {
+      console.log("Error or no data:", error);
+      return {};
     }
 
-    console.log("User profile data:", data);
-    return data.words;
+    try {
+      // Handle multiple levels of JSON encoding
+      let parsedWords = data.words;
+      while (typeof parsedWords === "string") {
+        try {
+          parsedWords = JSON.parse(parsedWords);
+        } catch {
+          break;
+        }
+      }
+
+      // Convert to WordData objects
+      const result: { [wordId: string]: WordData } = {};
+      for (const [id, data] of Object.entries(parsedWords)) {
+        const wordData = data as {
+          seenCorrect: number;
+          seenWrong: number;
+          correct: number;
+          wrong: number;
+        };
+        result[id] = new WordData(
+          parseInt(id),
+          wordData.seenCorrect,
+          wordData.seenWrong,
+          wordData.correct,
+          wordData.wrong
+        );
+      }
+      this.userWords = result;
+      return result;
+    } catch (e) {
+      console.error("Error parsing words data:", e);
+      return {};
+    }
   }
-  static async updateUserWords(wordData: WordData) {
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError) {
-      console.log("Error getting user:", authError);
-      return null;
-    }
-
-    const user = authData.user;
+  static async getUserWords(): Promise<string[]> {
+    const user = await this.getUser();
     if (!user) {
       console.log("No user found");
-      return null;
+      return [];
     }
 
-    // Retrieve user profile information
-    const { data, e, status } = await supabase
-      .from("profiles") // Ensure the table name matches exactly with your database
-      .select("*")
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("words")
       .eq("id", user.id)
       .single();
 
-    if (e) {
-      console.log("Error fetching user words:", e);
-      return null;
+    if (error || !data || !data.words) {
+      console.log("Error or no data:", error);
+      return [];
     }
-    // Fetch the current words from the database and if the word exists, update it, if not, insert it
-    const words = data.words;
-    const existingWord = words.find(
-      (word: WordData) => word.id === wordData.id
-    );
-    var updatedWords: any;
-    if (existingWord) {
-      // Update the existing word
-      updatedWords = words.map((word: WordData) =>
-        word.id === wordData.id ? wordData : word
-      );
+
+    try {
+      // Handle multiple levels of JSON encoding
+      let parsedWords = data.words;
+      while (typeof parsedWords === "string") {
+        try {
+          parsedWords = JSON.parse(parsedWords);
+        } catch {
+          break;
+        }
+      }
+
+      // Convert to WordData objects
+      const result: string[] = [];
+      for (const [id, data] of Object.entries(parsedWords)) {
+        result.push(id);
+      }
+      return result;
+    } catch (e) {
+      console.error("Error parsing words data:", e);
+      return [];
+    }
+  }
+
+  static async updateUserWord(word: string, answerType: AnswerType) {
+    const user = await this.getUser();
+    if (!user) return;
+
+    // Get word ID first
+    const wordID = await DatabaseService.getWordID(word);
+    if (!wordID) {
+      console.error("Word ID not found for:", word);
+      return;
+    }
+
+    // Get current words data
+    let words = await this.fetchUserWords();
+
+    // Update or create word data
+    if (wordID in words) {
+      const existingWord = words[wordID];
+      switch (answerType) {
+        case AnswerType.Correct:
+          existingWord.correct++;
+          break;
+        case AnswerType.Wrong:
+          existingWord.wrong++;
+          break;
+        case AnswerType.SeenCorrect:
+          existingWord.seenCorrect++;
+          break;
+        case AnswerType.SeenWrong:
+          existingWord.seenWrong++;
+          break;
+      }
     } else {
-      updatedWords = [...words, wordData];
+      words[wordID] = new WordData(wordID, 0, 0, 0, 0);
+      switch (answerType) {
+        case AnswerType.Correct:
+          words[wordID].correct = 1;
+          break;
+        case AnswerType.Wrong:
+          words[wordID].wrong = 1;
+          break;
+        case AnswerType.SeenCorrect:
+          words[wordID].seenCorrect = 1;
+          break;
+        case AnswerType.SeenWrong:
+          words[wordID].seenWrong = 1;
+          break;
+      }
     }
+
+    // Update database with single JSON encoding
     const updates = {
-      id: data.id,
-      words: updatedWords,
+      id: user.id,
+      words: JSON.stringify(words),
     };
+
     const { error } = await supabase.from("profiles").upsert(updates);
     if (error) {
-      console.log("Error updating word data:", error);
+      console.error("Error updating word data:", error);
     }
+  }
+
+  static async getWordsForPreset(presetId: string): Promise<number[]> {
+    const { data, error } = await supabase
+      .from("preset_words")
+      .select("word_id")
+      .eq("preset_id", presetId);
+
+    if (error) {
+      console.error("Error fetching words for preset:", error);
+      return [];
+    }
+
+    return data.map((item) => item.word_id);
+  }
+
+  static async getWordData(wordId: number): Promise<WordData> {
+    const userWords = await this.fetchUserWords();
+    return userWords[wordId];
   }
 }
 

@@ -4,12 +4,14 @@ import axios from 'axios';
 import GPTService from '@/services/GPTservice';
 import DatabaseService from '@/services/local_database_service';
 import { ThemedText } from '@/components/ThemedText';
+import { WordScheduler } from '@/services/WordScheduler';
+import SupabaseService, { AnswerType } from '@/services/supabase';
 
 const Content = () => {
   const [loading, setLoading] = useState(false);
   const [question, setQuestion] = useState('');
-  const [options, setOptions] = useState([]);
-  const [correctAnswer, setCorrectAnswer] = useState([]);
+  const [options, setOptions] = useState<string[]>([]);
+  const [correctAnswer, setCorrectAnswer] = useState<string>('');
   var db = null;
 
   useEffect(() => {
@@ -21,34 +23,21 @@ const Content = () => {
     console.log("Starting question generation...");
 
     try {
-      const toeflWords: String[] = await DatabaseService.fetchToeflWords();
-      console.log("Fetched TOEFL words:", toeflWords);
-
-      if (toeflWords.length === 0) {
-        throw new Error('No words found in the TOEFL preset.');
-      }
-
+      // const 
+      const words = await WordScheduler.getNextwords();
       // Randomly select a word from the list
-      const correctWord = toeflWords[Math.floor(Math.random() * toeflWords.length)];
+      const correctWord = words[0];
+      const wrongWords = words.slice(1, 4);
       console.log("Selected correct word:", correctWord);
 
       // Select additional words for options
-      const optionsSet = new Set();
-      optionsSet.add(correctWord);
-
-      while (optionsSet.size < 4) {
-        const randomWord = toeflWords[Math.floor(Math.random() * toeflWords.length)];
-        optionsSet.add(randomWord);
-      }
-
-      const shuffledOptions = Array.from(optionsSet).sort(() => Math.random() - 0.5);
-      console.log("Generated options:", shuffledOptions);
+      console.log("Generated options:", wrongWords);
       const response = await GPTService.generateFillSentence(correctWord)
       console.log("Generated sentence:", response);
 
       // Replace word with blank and update state
       setQuestion(response.replace(correctWord, '____'));
-      setOptions(shuffledOptions);
+      setOptions(words);
       setCorrectAnswer(correctWord);
     } catch (error) {
       console.error("Error during question generation:", error);
@@ -61,11 +50,16 @@ const Content = () => {
 
 
 
-  const handleAnswer = (selectedOption : any) => {
+  const handleAnswer = (selectedOption : string) => {
     if (selectedOption === correctAnswer) {
       Alert.alert('Correct!', 'You selected the right answer.');
+      SupabaseService.updateUserWord(correctAnswer, AnswerType.Correct);
+      //update other words
+      
     } else {
       Alert.alert('Incorrect', `The correct answer was ${correctAnswer}.`);
+      SupabaseService.updateUserWord(correctAnswer, AnswerType.Wrong);
+      
     }
     generateQuestion();
   };

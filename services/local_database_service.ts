@@ -31,7 +31,7 @@ class DatabaseService {
       if (!asset.downloaded) {
         await asset.downloadAsync().then((value) => {
           asset = value;
-          console.log("asset downloadAsync - finished");
+          // console.log("asset downloadAsync - finished");
         });
 
         let remoteURI = asset.localUri;
@@ -74,26 +74,6 @@ class DatabaseService {
 
     // Open the database
     return SQLite.openDatabaseAsync(dbName);
-  }
-
-  public static async fetchToeflWords(): Promise<string[]> {
-    const db = await DatabaseService.getInstance();
-    try {
-      const result = await db.getAllAsync(
-        `SELECT vocabulary.word FROM vocabulary
-        JOIN word_preset ON vocabulary.word = word_preset.word
-        JOIN presets ON word_preset.preset_id = presets.id
-        WHERE presets.name = ?`,
-        ["TOEFL"]
-      );
-
-      const words = result.map((row) => row.word);
-      console.log("Fetched TOEFL words:", words);
-      return words;
-    } catch (error) {
-      console.error("Error fetching TOEFL words:", error); //emotional damage//
-      throw error;
-    }
   }
 
   public static async getWordID(word: string): Promise<number> {
