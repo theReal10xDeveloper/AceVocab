@@ -56,7 +56,7 @@ const WordCard: React.FC<WordCardProps> = ({ wordId }) => {
 const styles = StyleSheet.create({
     card: {
         width: "45%",
-        height: "14%",
+        height: "20%",
     backgroundColor: '#fff',
     borderRadius: 8,
     padding: 16,
