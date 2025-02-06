@@ -17,7 +17,7 @@ export default function SettingsView() {
 
   useEffect(() => {
     // Fetch the current user session
-      const user = SupabaseService.fetchUserWords()
+      // const user = SupabaseService.fetchUserWords()
       const words = {}
     // SupabaseService.updateUserWord(words);
     console.log(user);
@@ -31,9 +31,7 @@ export default function SettingsView() {
           <Auth/>
           <ThemedText style={{ fontSize: 18, marginBottom: 70 }}>Select Vocab Presets</ThemedText>
       <ThemedText style={{ fontSize: 18, marginBottom: 70 }}>{user}</ThemedText>
-      <WordCard
-        wordId={13567}
-      />
+    
     </View>
   );
 }
