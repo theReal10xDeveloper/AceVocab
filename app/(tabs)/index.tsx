@@ -36,7 +36,7 @@ export default function HomeScreen() {
     return (
       //Make it in the center
       <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ThemedText style={{ fontSize: 18, marginBottom: 20 }}>Welcome</ThemedText>
+        <ThemedText style={{ fontSize: 18, marginBottom: 20 }}>Welcomesad</ThemedText>
       
         <ThemedText style={{ fontSize: 18, marginBottom: 70 }}>{session ? session.user?.email : 'No user'}</ThemedText>
       

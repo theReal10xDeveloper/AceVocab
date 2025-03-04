@@ -1,50 +1,80 @@
-
-import { StyleSheet, Image, Platform, View, Button } from 'react-native';
-
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import { Auth } from '@/components/Auth.apple';
+import { Auth } from '@/components/Auth';
 import SupabaseService, { supabase } from '@/services/supabase';
 import { useEffect, useState } from 'react';
-import WordCard from '@/components/WordCard';
+import { Session } from '@supabase/supabase-js';
 
-export default function SettingsView() {
-    const [user, setUser] = useState(null);
+export default function SettingsScreen() {
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
-    // Fetch the current user session
-      // const user = SupabaseService.fetchUserWords()
-      const words = {}
-    // SupabaseService.updateUserWord(words);
-    console.log(user);
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
 
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
 
+    return () => subscription.unsubscribe();
   }, []);
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
-        <ThemedText style={{ fontSize: 18, marginBottom: 20 }}>Settings</ThemedText>
-          <Auth/>
-          <ThemedText style={{ fontSize: 18, marginBottom: 70 }}>Select Vocab Presets</ThemedText>
-      <ThemedText style={{ fontSize: 18, marginBottom: 70 }}>{user}</ThemedText>
-    
-    </View>
+    <ThemedView style={styles.container}>
+      <ThemedText style={styles.title}>Settings</ThemedText>
+
+      {session ? (
+        <>
+          <ThemedText style={styles.email}>{session.user.email}</ThemedText>
+          <ThemedText
+            style={styles.signOut}
+            onPress={() => supabase.auth.signOut()}
+          >
+            Sign Out
+          </ThemedText>
+        </>
+      ) : (
+        <Auth />
+      )}
+
+      <ThemedText style={styles.sectionTitle}>Select Vocab Presets</ThemedText>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    flex: 1,
+    backgroundColor: '#000',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
   },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  email: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  signOut: {
+    fontSize: 16,
+    color: '#FF3B30',
+    marginBottom: 30,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  text: {
+    fontSize: 16,
+    textAlign: 'center',
   },
 });

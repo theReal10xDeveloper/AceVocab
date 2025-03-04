@@ -1811,10 +1811,15 @@
   dependencies:
     merge-options "^3.0.4"
 
-"@react-native-google-signin/google-signin@^13.1.0":
-  version "13.1.0"
-  resolved "https://registry.npmjs.org/@react-native-google-signin/google-signin/-/google-signin-13.1.0.tgz"
-  integrity sha512-C2/sqb0/s0c+Dwc/mykASZsRuHxGqn7SFrCxCY9D8p8IOQO05haInhCc7lzraJshRixGva5c/4usQZ71HMYSEQ==
+"@react-native-community/netinfo@^11.4.1":
+  version "11.4.1"
+  resolved "https://registry.npmjs.org/@react-native-community/netinfo/-/netinfo-11.4.1.tgz"
+  integrity sha512-B0BYAkghz3Q2V09BF88RA601XursIEA111tnc2JOaN7axJWmNefmfjZqw/KdSxKZp7CZUuPpjBmz/WCR9uaHYg==
+
+"@react-native-google-signin/google-signin@^13.2.0":
+  version "13.2.0"
+  resolved "https://registry.npmjs.org/@react-native-google-signin/google-signin/-/google-signin-13.2.0.tgz"
+  integrity sha512-1D7eWPE7itfPmNwLkBylaoiIXAvHQNalt+AfKWcgLp45ZvPh6D5wJEhbs03PJtwO7j+Nc7Z9+DjZ2auIlWzZjw==
 
 "@react-native/assets-registry@0.76.6":
   version "0.76.6"
@@ -5574,6 +5579,11 @@ lightningcss-linux-x64-gnu@1.27.0:
   resolved "https://registry.npmjs.org/lightningcss-linux-x64-gnu/-/lightningcss-linux-x64-gnu-1.27.0.tgz"
   integrity sha512-Dk/jovSI7qqhJDiUibvaikNKI2x6kWPN79AQiD/E/KeQWMjdGe9kw51RAgoWFDi0coP4jinaH14Nrt/J8z3U4A==
 
+lightningcss-linux-x64-musl@1.27.0:
+  version "1.27.0"
+  resolved "https://registry.npmjs.org/lightningcss-linux-x64-musl/-/lightningcss-linux-x64-musl-1.27.0.tgz"
+  integrity sha512-QKjTxXm8A9s6v9Tg3Fk0gscCQA1t/HMoF7Woy1u68wCk5kS4fR+q3vXa1p3++REW784cRAtkYKrPy6JKibrEZA==
+
 lightningcss@~1.27.0:
   version "1.27.0"
   resolved "https://registry.npmjs.org/lightningcss/-/lightningcss-1.27.0.tgz"
@@ -6765,7 +6775,7 @@ react-native-reanimated@*, react-native-reanimated@~3.16.1:
     convert-source-map "^2.0.0"
     invariant "^2.2.4"
 
-react-native-safe-area-context@*, "react-native-safe-area-context@>= 4.0.0", react-native-safe-area-context@4.12.0:
+react-native-safe-area-context@*, react-native-safe-area-context@^4.12.0, "react-native-safe-area-context@>= 4.0.0":
   version "4.12.0"
   resolved "https://registry.npmjs.org/react-native-safe-area-context/-/react-native-safe-area-context-4.12.0.tgz"
   integrity sha512-ukk5PxcF4p3yu6qMZcmeiZgowhb5AsKRnil54YFUUAXVIS7PJcMHGGC+q44fCiBg44/1AJk5njGMez1m9H0BVQ==
@@ -6807,7 +6817,7 @@ react-native-webview@*, react-native-webview@13.12.5:
     escape-string-regexp "^4.0.0"
     invariant "2.2.4"
 
-react-native@*, "react-native@^0.0.0-0 || >=0.60 <1.0", react-native@>=0.73.0, react-native@0.76.6:
+react-native@*, "react-native@^0.0.0-0 || >=0.60 <1.0", react-native@>=0.59, react-native@>=0.73.0, react-native@0.76.6:
   version "0.76.6"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.76.6.tgz"
   integrity sha512-AsRi+ud6v6ADH7ZtSOY42kRB4nbM0KtSu450pGO4pDudl4AEK/AF96ai88snb2/VJJSGGa/49QyJVFXxz/qoFg==

@@ -15,7 +15,10 @@
       "supportsTablet": true,
       "bundleIdentifier": "Kai.C.AceVocab",
       "appleTeamId": "3NX9YQA562",
-      "usesAppleSignIn": true
+      "usesAppleSignIn": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {

@@ -132,7 +132,7 @@ def extract_word_data(word, language_pair="english-chinese-traditional", max_ret
 
 
 if __name__ == "__main__":
-    words = ["account", "hello", "world", "example", "python", "data"]
+    words = ["account"]
     all_word_data = {}
     for word in words:
         data = extract_word_data(word)

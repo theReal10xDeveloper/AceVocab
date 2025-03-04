@@ -1,109 +1,77 @@
-// WordCard.tsx
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import SupabaseService, { WordData } from '@/services/supabase';
-import DatabaseService from '@/services/local_database_service';
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { ThemedText } from "./ThemedText";
+import SupabaseService from "@/services/supabase";
+import { UserWord } from "@/types/user";
 
 interface WordCardProps {
-  wordId: number;  // Added wordId prop
+  wordId: number;
+  onPress?: (word: string) => void; // New prop for handling press
 }
 
-const WordCard: React.FC<WordCardProps> = ({ wordId }) => {
-  const [word, setWord] = useState<string>('');
-    const [loading, setLoading] = useState(true);
-    const wordData = SupabaseService.userWords[wordId];
-  const proficiency = calculateProficiency(wordData);
+const WordCard: React.FC<WordCardProps> = ({ wordId, onPress }) => {
+  const [wordData, setWordData] = useState<UserWord | null>(null);
 
   useEffect(() => {
-    const fetchWord = async () => {
-      try {
-        const fetchedWord = await DatabaseService.getWord(wordId);
-        setWord(fetchedWord);
-      } catch (error) {
-        console.error('Error fetching word:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchWord();
+    const word = SupabaseService.userWords[wordId];
+    if (word) {
+      setWordData(word);
+    }
   }, [wordId]);
 
-  if (loading) {
-    return (
-      <View style={styles.card}>
-        <ActivityIndicator size="small" color="#4CAF50" />
-      </View>
-    );
+  // Handle card press
+  const handlePress = () => {
+    if (wordData && onPress) {
+      onPress(wordData.word);
+    }
+  };
+
+  if (!wordData) {
+    return null;
   }
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.word}>{word}</Text>
-      <View style={styles.proficiencyContainer}>
-        <View style={[styles.proficiencyBar, { width: `${proficiency}%` }]} />
-        <Text style={styles.proficiencyText}>{Math.round(proficiency)}%</Text>
+    <TouchableOpacity 
+      style={styles.card}
+      onPress={handlePress}
+      activeOpacity={0.7}
+    >
+      <View style={styles.contentContainer}>
+        <ThemedText style={styles.word}>{wordData.word}</ThemedText>
+        <ThemedText style={styles.definition} numberOfLines={3}>
+          {wordData.definition || "No definition available"}
+        </ThemedText>
       </View>
-      <View style={styles.statsContainer}>
-        <Text style={styles.statsText}>{wordData.correct}</Text>
-        <Text style={styles.statsText}> {wordData.wrong}</Text>
-        <Text style={styles.statsText}> {wordData.seenCorrect + wordData.seenWrong}</Text>
-      </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-    card: {
-        width: "45%",
-        height: "20%",
-    backgroundColor: '#fff',
-    borderRadius: 8,
+  card: {
+    backgroundColor: "#1e1e1e",
+    borderRadius: 12,
     padding: 16,
-    margin: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    marginBottom: 16,
+    width: "48%",
+    minHeight: 140,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
     elevation: 3,
   },
+  contentContainer: {
+    flex: 1,
+  },
   word: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 12,
-    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 8,
   },
-  proficiencyContainer: {
-    height: 20,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 10,
-    overflow: 'hidden',
-    marginBottom: 12,
-    position: 'relative',
-  },
-  proficiencyBar: {
-    height: '100%',
-    backgroundColor: '#4CAF50',
-    position: 'absolute',
-    left: 0,
-  },
-  proficiencyText: {
-    position: 'absolute',
-    width: '100%',
-    textAlign: 'center',
-    lineHeight: 20,
-    color: '#000',
-    fontWeight: 'bold',
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 8,
-  },
-  statsText: {
+  definition: {
     fontSize: 14,
-    color: '#666',
-  }
+    color: "#aaa",
+  },
 });
 
 export default WordCard;
