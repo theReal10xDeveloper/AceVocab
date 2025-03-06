@@ -12,6 +12,7 @@ export default function () {
   })
 
   return (
+
     <GoogleSigninButton
       size={GoogleSigninButton.Size.Wide}
       color={GoogleSigninButton.Color.Dark}

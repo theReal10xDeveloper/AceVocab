@@ -10,6 +10,11 @@ import { useEffect, useState } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { WordScheduler } from '@/services/WordScheduler';
 import WordCard from '@/components/WordCard';
+import * as WebBrowser from 'expo-web-browser';
+
+
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function HomeScreen() {
   const [session, setSession] = useState<Session | null>(null)
