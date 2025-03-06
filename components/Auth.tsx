@@ -1,6 +1,6 @@
 import { Platform, View, StyleSheet } from 'react-native'
 import { Auth as AppleAuth } from './Auth.apple'
-import { GoogleAuth } from './Auth.google'
+import GoogleAuth  from './Auth.google'
 
 export function Auth() {
     return (

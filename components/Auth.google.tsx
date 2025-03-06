@@ -1,8 +1,4 @@
-import {
-  GoogleSignin,
-  GoogleSigninButton,
-  statusCodes,
-} from '@react-native-google-signin/google-signin'
+
 import { supabase } from '../services/supabase'
 import * as Google from 'expo-auth-session/providers/google'
 import * as WebBrowser from "expo-web-browser";
@@ -10,7 +6,7 @@ import { Button } from 'react-native';
 
 
 WebBrowser.maybeCompleteAuthSession();
-export default function () {
+export default function GoogleAuth() {
 
 
   const [request, response, promptAsync] = Google.useAuthRequest({
@@ -20,10 +16,8 @@ export default function () {
   });
 
   return (
-
     <Button
       title="Sign in with Google"
-      color={GoogleSigninButton.Color.Dark}
       onPress={async () => {
         try {
           const result = await promptAsync()
@@ -37,17 +31,10 @@ export default function () {
             throw new Error('no ID token present!')
           }
         } catch (error: any) {
-          if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-            // user cancelled the login flow
-          } else if (error.code === statusCodes.IN_PROGRESS) {
-            // operation (e.g. sign in) is in progress already
-          } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-            // play services not available or outdated
-          } else {
-            // some other error happened
+          console.log(error)
           }
         }
-      }}
+      }
     />
   )
 }
