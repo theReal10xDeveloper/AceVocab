@@ -4,26 +4,33 @@ import {
   statusCodes,
 } from '@react-native-google-signin/google-signin'
 import { supabase } from '../services/supabase'
+import * as Google from 'expo-auth-session/providers/google'
+import * as WebBrowser from "expo-web-browser";
+import { Button } from 'react-native';
 
+
+WebBrowser.maybeCompleteAuthSession();
 export default function () {
-  GoogleSignin.configure({
-    scopes: ['https://www.googleapis.com/auth/drive.readonly'],
-    webClientId: '297363518648-p4uvjst5td2qvu7gfmm54netj1cag9bp.apps.googleusercontent.com',
-  })
+
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    androidClientId: "",
+    iosClientId: "297363518648-p4uvjst5td2qvu7gfmm54netj1cag9bp.apps.googleusercontent.com",
+    webClientId: "297363518648-ddbetfva2ht3of4jorkrgn88sp7gm587.apps.googleusercontent.com",
+  });
 
   return (
 
-    <GoogleSigninButton
-      size={GoogleSigninButton.Size.Wide}
+    <Button
+      title="Sign in with Google"
       color={GoogleSigninButton.Color.Dark}
       onPress={async () => {
         try {
-          await GoogleSignin.hasPlayServices()
-          const userInfo = await GoogleSignin.signIn()
-          if (userInfo.data.idToken) {
+          const result = await promptAsync()
+          if (result.type === 'success') {
             const { data, error } = await supabase.auth.signInWithIdToken({
               provider: 'google',
-              token: userInfo.data.idToken,
+              token: result.authentication?.accessToken || '',
             })
             console.log(error, data)
           } else {
@@ -44,3 +51,4 @@ export default function () {
     />
   )
 }
+
